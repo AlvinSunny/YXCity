@@ -24,9 +24,7 @@ Pod::Spec.new do |s|
   #   * Try to keep it short, snappy and to the point.
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
-  s.description  = <<-DESC
-                   DESC
-
+  s.description  = " This is a national urban information based on MAMap wedAPI access to tools, if you need to select city address function used in the software, then this may be able to help you."
   s.homepage     = "https://github.com/AlvinSunny/YXCity.git"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
