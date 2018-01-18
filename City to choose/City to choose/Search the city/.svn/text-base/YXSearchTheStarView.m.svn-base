@@ -1,0 +1,212 @@
+//  YXSearchTheStarView.m
+//  范时特
+//  Created by 一笑 on 2017/12/25.
+//  Copyright © 2017年 boyikeji. All rights reserved.
+
+#import "YXSearchTheStarView.h"
+#import "BWhenHistoricalHeaderView.h"
+#import "BWhenRedsCollectionCell.h"
+#import "YXSearchHistoryModel.h"
+
+@interface YXSearchTheStarView () <UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UICollectionViewDataSource>
+
+@property (weak, nonatomic) IBOutlet UIButton *searchCancelBt;
+
+/**历史记录*/
+@property (weak, nonatomic) IBOutlet UITableView *historicalRecordTableView;
+
+/**关键字输入框*/
+@property (weak, nonatomic) IBOutlet UITextField *stheRedKeywordFl;
+
+/**红人列表*/
+@property (weak, nonatomic) IBOutlet UICollectionView *redSCollectionView;
+
+/**红人数组*/
+@property (nonatomic, strong) NSMutableArray     *redList;
+
+/**历史数组*/
+@property (nonatomic, strong) NSMutableArray     *historicalList;
+
+@property (nonatomic, strong) UIFont             *textFont;
+
+@end
+
+@implementation YXSearchTheStarView
+
+-(NSMutableArray *)redList
+{
+    if (!_redList) {
+        _redList = [NSMutableArray new];
+    }
+    return _redList;
+}
+
+-(NSMutableArray *)historicalList
+{
+    if (!_historicalList) {
+        _historicalList = [NSMutableArray new];
+    }
+    return _historicalList;
+}
+
+-(void)layoutSubviews{
+    [super layoutSubviews];
+    self.stheRedKeywordFl.text = @"";
+}
+
+-(void)awakeFromNib
+{
+    [super awakeFromNib];
+    
+    [self.searchCancelBt addTarget:self action:@selector(searchCancelAction) forControlEvents:UIControlEventTouchUpInside];
+    self.historicalRecordTableView.delegate = self;
+    self.historicalRecordTableView.dataSource = self;
+    self.stheRedKeywordFl.delegate = self;
+    [self.historicalRecordTableView reloadData];
+    UICollectionViewFlowLayout *redFlowLayout  = [[UICollectionViewFlowLayout alloc] init];
+    redFlowLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
+    self.redSCollectionView.collectionViewLayout = redFlowLayout;
+    self.redSCollectionView.delegate = self;
+    self.redSCollectionView.dataSource = self;
+    [self.redSCollectionView registerNib:[UINib nibWithNibName:@"BWhenRedsCollectionCell" bundle:nil] forCellWithReuseIdentifier:@"BWhenRedsCollectionCellId"];
+
+    if ([kYXDeViceModel isEqualToString:Device_iPhone5]||[kYXDeViceModel isEqualToString:Device_iPhone5C]||[kYXDeViceModel isEqualToString:Device_iPhone5S]) {
+        self.textFont = H14;
+    }else if ([kYXDeViceModel isEqualToString:Device_iPhone6]||[kYXDeViceModel isEqualToString:Device_iPhone6S])
+    {
+        self.textFont = H15;
+    }else
+    {
+        self.textFont = H16;
+    }
+    
+    //输入文字监听
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stheRedKeywordtextDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
+    
+}
+
+- (void)uploadYXSearchData:(NSMutableArray *)redList{
+    [self.redList removeAllObjects];
+    self.redList  = redList;
+    [self insertSubview:self.redSCollectionView aboveSubview:self.historicalRecordTableView];
+    [self.redSCollectionView reloadData];
+}
+
+- (void)uploadYXSearchHistory:(NSMutableArray *)historyList{
+    [self.historicalList removeAllObjects];
+    [self insertSubview:self.historicalRecordTableView aboveSubview:self.redSCollectionView];
+    self.historicalList = historyList;
+    if (self.historicalList.count) {
+        [self.historicalRecordTableView reloadData];
+    }else{
+        [self insertSubview:self.redSCollectionView aboveSubview:self.historicalRecordTableView];
+    }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [self searchData];
+    return YES;
+}
+
+/**
+ 搜索数据
+ */
+- (void)searchData{
+    [self.delegate searchRedName:self.stheRedKeywordFl.text];
+    [self.stheRedKeywordFl resignFirstResponder];
+}
+
+#pragma mark UICollectionViewDataSource
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+    return self.redList.count;
+}
+
+- (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+    BWhenRedsCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"BWhenRedsCollectionCellId" forIndexPath:indexPath];
+    BWhenRedCollModel *mo = self.redList[indexPath.row];
+    [cell uploadModel:mo];
+    return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    
+    BWRedsShowController *vc = [[BWRedsShowController alloc]init];
+    BWhenRedCollModel * mo =  self.redList[indexPath.row];
+    if (ValidStr(mo.bidder_id)) {
+        [vc uploadBidderId:mo.bidder_id];
+        [[ToolsMethod getCurrentVC].navigationController pushViewController:vc animated:YES];
+    }
+}
+
+#pragma mark - UICollectionViewDelegateFlowLayout
+//设置cell的大小
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+    CGSize size = CGSizeMake((LZWidth)/2.0-30, HeightScale(230));
+    return size;
+}
+
+//设置cell与边缘的间隔
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
+    UIEdgeInsets inset = UIEdgeInsetsMake(0, 20, 0, 20);
+    return inset;
+}
+
+//最小行间距
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section{
+    return 20;
+}
+
+#pragma mark tableview 代理
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return self.historicalList.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    static NSString   *histId = @"histId";
+    UITableViewCell  *cell = [tableView dequeueReusableCellWithIdentifier:histId];
+    if (!cell) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:histId];
+    }
+    YXSearchHistoryModel *mo = self.historicalList[indexPath.row];
+    cell.textLabel.text = mo.search_name;
+    cell.textLabel.font = self.textFont;
+    cell.textLabel.textColor = LZColorFromRGB(0x333333);
+    return cell;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    YXSearchHistoryModel *mo = self.historicalList[indexPath.row];
+    [self.delegate searchRedName:mo.search_name];
+}
+
+-(UIView*)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    BWhenHistoricalHeaderView *header = (BWhenHistoricalHeaderView *)[ToolsMethod viewWithLoadNibNamed:@"BWhenHistoricalHeaderView"];
+    header.frame = CGRectMake(0, 0, LZWidth, HeightScale(30));
+    [header.histricalEmptyBt addTarget:self action:@selector(histricalEmptyAction) forControlEvents:UIControlEventTouchUpInside];
+    return header;
+}
+
+- (void)histricalEmptyAction{
+    [self.delegate emptyTheSearchContent];
+}
+
+- (void)searchCancelAction
+{
+    [[UIApplication sharedApplication].keyWindow endEditing:YES];
+    [self.delegate cancelSearchTheReds];
+}
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+
+@end

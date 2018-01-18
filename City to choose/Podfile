@@ -1,0 +1,8 @@
+target 'City to choose' do
+pod 'WHC_ModelSqliteKit'
+pod 'YYKit'
+pod 'Masonry'
+pod 'WHC_Model'
+end
+
+

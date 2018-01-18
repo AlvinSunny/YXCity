@@ -1,0 +1,39 @@
+//
+//  YXSearchTheStarView.h
+//  范时特
+//
+//  Created by 一笑 on 2017/12/25.
+//  Copyright © 2017年 boyikeji. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+//typedef NS_ENUM(NSInteger, YXSearchType)
+//{
+//    YXSearchStarType = 1,            //明星
+//    YXSearchRedType = 2,             //红人
+//    YXSearchSurroundingType = 3,     //周边
+//};
+
+@protocol YXSearchTheStarViewDelegate <NSObject>
+
+/**取消搜索红人*/
+- (void)cancelSearchTheReds;
+
+/**搜索红人名字*/
+- (void)searchRedName:(NSString *)name;
+
+/**清空搜索历史*/
+- (void)emptyTheSearchContent;
+
+@end
+
+@interface YXSearchTheStarView : UIView
+
+@property (nonatomic, weak) id <YXSearchTheStarViewDelegate> delegate;
+
+- (void)uploadYXSearchData:(NSMutableArray *)redList;
+
+- (void)uploadYXSearchHistory:(NSMutableArray *)historyList;
+
+@end

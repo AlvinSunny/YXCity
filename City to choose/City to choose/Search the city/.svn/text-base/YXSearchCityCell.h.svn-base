@@ -1,0 +1,16 @@
+//
+//  YXSearchCityCell.h
+//  范时特
+//
+//  Created by 一笑 on 2017/12/28.
+//  Copyright © 2017年 boyikeji. All rights reserved.
+//
+
+#import "AlvinBaseCell.h"
+
+@interface YXSearchCityCell : AlvinBaseCell
+
+- (void)configTitleString:(NSString *)titleString;
+
+@property (weak, nonatomic) IBOutlet UILabel *lineLb;
+@end
