@@ -79,7 +79,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "http://EXAMPLE/City.git","https://github.com/netyouli/WHC_Model","https://github.com/netyouli/WHC_ModelSqliteKit" :tag => "#{s.version}" }
+  s.source       = { :git => "http://EXAMPLE/City.git", :tag => "#{s.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
